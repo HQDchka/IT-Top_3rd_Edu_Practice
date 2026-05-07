@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добрые Лапы - Приют для животных</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('misc/hero.jpeg') center/cover no-repeat;
+            color: white;
+            padding: 100px 20px;
+            text-align: center;
+        }
+        .hero h2, .hero p {
+            font-size: 42px;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+            color: #f8f9fa;
+        }
+        .section {
+            padding: 60px 0;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 40px;
+            color: #333;
+        }
+        .animals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        .animal-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .animal-card:hover {
+            transform: translateY(-8px);
+        }
+        .animal-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+        .animal-info {
+            padding: 18px;
+        }
+        .animal-name {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .animal-meta {
+            color: #666;
+            font-size: 14px;
+            margin: 8px 0;
+        }
+        .btn-adopt {
+            background: #28a745;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-adopt:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="site-header">
+        <h1>🐾 Добрые Лапы</h1>
+        <div class="user-area" id="userArea">
+            <span class="user-name" id="userName"></span>
+            <button class="btn btn-primary" id="authBtn">Войти</button>
+        </div>
+    </div>
+    
+    <div class="site-content">
+        <!-- Hero -->
+        <div class="hero">
+            <h2>Мы даём второй шанс хвостатым друзьям</h2>
+            <p style="font-size: 20px; max-width: 700px; margin: 0 auto 30px;">
+                Приют для бездомных собак и кошек
+            </p>
+            <button class="btn btn-primary" style="font-size: 18px; padding: 14px 32px;" id="supportBtn">
+                Связаться с нами
+            </button>
+        </div>
+
+        <!-- About -->
+        <div class="section" style="background: white;">
+            <div class="site-content">
+                <h2 class="section-title">О приюте</h2>
+                <p style="text-align: center; max-width: 800px; margin: 0 auto; font-size: 18px; color: #555;">
+                    «Добрые Лапы» — это частный приют, где мы спасаем, лечим и ищем новые дома для собак и кошек, 
+                    оказавшихся на улице. С 2018 года мы помогли более 1200 животным обрести любящую семью.
+                </p>
+            </div>
+        </div>
+
+        <!-- Наши питомцы -->
+        <div class="section" style="background: #f8f9fa;">
+            <div class="site-content">
+                <h2 class="section-title">Наши питомцы ищут дом</h2>
+                <div class="animals-grid">
+                    <div class="animal-card">
+                        <img src="misc/baron.png" alt="Барон">
+                        <div class="animal-info">
+                            <div class="animal-name">Барон</div>
+                            <div class="animal-meta">Пёс • 3 года • Средний размер</div>
+                            <p>Спокойный, ласковый, очень любит детей и прогулки.</p>
+                            <button class="btn-adopt" onclick="alert('Спасибо! Заявка на знакомство с Бароном отправлена в поддержку.')">Хочу познакомиться</button>
+                        </div>
+                    </div>
+                    
+                    <div class="animal-card">
+                        <img src="misc/murka.jpg" alt="Мурка">
+                        <div class="animal-info">
+                            <div class="animal-name">Мурка</div>
+                            <div class="animal-meta">Кошка • 1.5 года • Стерилизована</div>
+                            <p>Игривая, чистоплотная, отлично ладит с другими кошками.</p>
+                            <button class="btn-adopt" onclick="alert('Спасибо! Заявка на знакомство с Муркой отправлена в поддержку.')">Хочу познакомиться</button>
+                        </div>
+                    </div>
+                    
+                    <div class="animal-card">
+                        <img src="misc/rex.jpg" alt="Рекс">
+                        <div class="animal-info">
+                            <div class="animal-name">Рекс</div>
+                            <div class="animal-meta">Пёс • 4 года • Крупный</div>
+                            <p>Умный, преданный, прошёл курс базовой дрессировки.</p>
+                            <button class="btn-adopt" onclick="alert('Спасибо! Заявка на знакомство с Рексом отправлена в поддержку.')">Хочу познакомиться</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Как помочь -->
+        <div class="section">
+            <div class="site-content">
+                <h2 class="section-title">Как вы можете помочь</h2>
+                <div class="features">
+                    <div class="feature-card">
+                        <h3>Забрать домой</h3>
+                        <p>Станьте новым членом семьи для одного из наших питомцев</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Волонтёрство</h3>
+                        <p>Помогайте с выгулом, уборкой и социализацией животных</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Поддержать приют</h3>
+                        <p>Любая финансовая помощь идёт на корм, лечение и содержание</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Виджет поддержки -->
+    <script src="/widget.js"></script>
+
+    <script>
+        async function checkAuth() {
+            try {
+                const res = await fetch('/api/user', { credentials: 'include' });
+                if (res.ok) {
+                    const user = await res.json();
+                    document.getElementById('userName').textContent = user.username;
+                    document.getElementById('authBtn').textContent = 'Выйти';
+                    document.getElementById('authBtn').onclick = logout;
+                } else {
+                    document.getElementById('userName').textContent = 'Гость';
+                    document.getElementById('authBtn').textContent = 'Войти';
+                    document.getElementById('authBtn').onclick = () => window.location.href = '/login.html';
+                }
+            } catch(e) {
+                document.getElementById('userName').textContent = 'Гость';
+                document.getElementById('authBtn').textContent = 'Войти';
+                document.getElementById('authBtn').onclick = () => window.location.href = '/login.html';
+            }
+        }
+        
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+            window.location.reload();
+        }
+        
+        // Кнопка в hero
+        document.getElementById('supportBtn').onclick = () => {
+            // Если виджет использует глобальную функцию открытия — можно вызвать её
+            if (typeof window.openSupportWidget === 'function') {
+                window.openSupportWidget();
+            } else {
+                alert('Зарегистрируйтесь и оставьте обращение, чтобы связаться с нами ❤️');
+            }
+        };
+        
+        // Инициализация
+        checkAuth();
+    </script>
+</body>
+</html>

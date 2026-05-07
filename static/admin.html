@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления - Техподдержка</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .admin-header {
+            background: #1a1a2e;
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .admin-header h1 {
+            font-size: 24px;
+        }
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        .admin-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: #666;
+            border-radius: 6px;
+        }
+        .admin-tab.active {
+            background: #007bff;
+            color: white;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .stat-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+        }
+        .tickets-table, .users-table {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            overflow: auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-collapse: collapse;
+        }
+        .tickets-table th, .tickets-table td,
+        .users-table th, .users-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .tickets-table th, .users-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            user-select: none;
+        }
+        .tickets-table th:hover, .users-table th:hover {
+            background: #e9ecef;
+        }
+        .sort-icon {
+            display: inline-block;
+            margin-left: 5px;
+            font-size: 12px;
+            color: #999;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-open { background: #ffc107; color: #333; }
+        .status-in_progress { background: #17a2b8; color: white; }
+        .status-closed { background: #28a745; color: white; }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+            margin: 0 2px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-body {
+            padding: 20px;
+        }
+        .reply-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .reply-user {
+            border-left: 3px solid #007bff;
+        }
+        .reply-support {
+            border-left: 3px solid #28a745;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        select {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .role-select {
+            padding: 4px 8px;
+        }
+        .filter-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        .loading {
+            text-align: center;
+            padding: 0 10px;
+            color: #666;
+        }
+        .toolbar {
+            display: flex;
+            gap: 15px;
+            padding: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        .role-filter select {
+            padding: 8px 12px;
+        }
+        .total-count {
+            padding: 8px 15px;
+            background: #e9ecef;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Панель управления поддержкой</h1>
+            <div>
+                <span id="userRole" style="margin-right: 15px;"></span>
+                <button class="btn-sm btn-primary" onclick="goToSite()">На сайт</button>
+                <button class="btn-sm btn-danger" onclick="logout()">Выйти</button>
+            </div>
+        </div>
+        
+        <div class="admin-tabs">
+            <button class="admin-tab active" data-tab="tickets">Обращения</button>
+            <button class="admin-tab" data-tab="stats">Статистика</button>
+            <button id="usersTabBtn" class="admin-tab" data-tab="users" style="display: none;">Пользователи</button>
+        </div>
+        
+        <div id="ticketsTab" class="tab-content">
+            <div class="toolbar">
+                <div class="search-box">
+                    <input type="text" id="searchInput" name="searchInput" placeholder="Поиск по теме или пользователю...">
+                </div>
+                <select id="statusFilter" name="statusFilter">
+                    <option value="">Все статусы</option>
+                    <option value="open">Открытые</option>
+                    <option value="in_progress">В работе</option>
+                    <option value="closed">Закрытые</option>
+                </select>
+                <button class="btn-sm btn-primary" onclick="loadTickets()">Обновить</button>
+            </div>
+            <div id="ticketsList" class="loading">Загрузка...</div>
+        </div>
+        
+        <div id="statsTab" class="tab-content" style="display: none;">
+            <div class="stats-grid" id="statsGrid" class="loading">Загрузка...</div>
+        </div>
+        
+        <div id="usersTab" class="tab-content" style="display: none;">
+            <div class="toolbar">
+                <div class="search-box">
+                    <input type="text" id="userSearchInput" name="userSearchInput" placeholder="Поиск по логину или email...">
+                </div>
+                <select id="roleFilter" name="roleFilter">
+                    <option value="">Все роли</option>
+                    <option value="user">Пользователи</option>
+                    <option value="specialist">Специалисты</option>
+                    <option value="admin">Администраторы</option>
+                </select>
+                <button class="btn-sm btn-primary" onclick="loadUsers()">Обновить</button>
+            </div>
+            <div id="usersList" class="loading">Загрузка...</div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно просмотра обращения -->
+    <div id="ticketModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Обращение #</h3>
+                <span class="close-modal" onclick="closeModal()" style="cursor:pointer; font-size:24px;">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="ticketInfo"></div>
+                <div id="repliesList" style="margin: 20px 0;"></div>
+                <div class="reply-form">
+                    <label for="replyMessage"><strong>Ответ пользователю:</strong></label>
+                    <textarea id="replyMessage" name="replyMessage" rows="3" placeholder="Напишите ответ..."></textarea>
+                    <div style="margin-top: 10px; display: flex; gap: 10px;">
+                        <button class="btn-sm btn-primary" onclick="sendReply()">Отправить ответ</button>
+                        <button id="closeBtn" class="btn-sm btn-danger" onclick="closeTicket()" style="display: none;">Закрыть обращение</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentUser = null;
+        let currentTicketId = null;
+        let currentTickets = [];
+        let allUsers = [];
+        let usersSortField = 'id';
+        let usersSortOrder = 'asc';
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            setupEventListeners();
+        });
+        
+        async function checkAuth() {
+            try {
+                const res = await fetch('/api/user', { credentials: 'include' });
+                if (!res.ok) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                currentUser = await res.json();
+                
+                if (currentUser.role !== 'admin' && currentUser.role !== 'specialist') {
+                    window.location.href = '/';
+                    return;
+                }
+                
+                document.getElementById('userRole').textContent = currentUser.role === 'admin' ? 'Администратор' : 'Специалист';
+                
+                if (currentUser.role === 'admin') {
+                    document.getElementById('usersTabBtn').style.display = 'block';
+                }
+                
+                await loadTickets();
+                await loadStats();
+                
+            } catch(e) {
+                console.error('Auth error:', e);
+                window.location.href = '/login.html';
+            }
+        }
+        
+        function setupEventListeners() {
+            document.querySelectorAll('.admin-tab').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.getAttribute('data-tab');
+                    switchTab(tab);
+                });
+            });
+            
+            const searchInput = document.getElementById('searchInput');
+            const statusFilter = document.getElementById('statusFilter');
+            if (searchInput) searchInput.addEventListener('input', () => filterTickets());
+            if (statusFilter) statusFilter.addEventListener('change', () => filterTickets());
+            
+            // Поиск и фильтр для пользователей
+            const userSearchInput = document.getElementById('userSearchInput');
+            const roleFilter = document.getElementById('roleFilter');
+            if (userSearchInput) userSearchInput.addEventListener('input', () => filterAndSortUsers());
+            if (roleFilter) roleFilter.addEventListener('change', () => filterAndSortUsers());
+        }
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            
+            const activeTab = document.getElementById(`${tab}Tab`);
+            if (activeTab) activeTab.style.display = 'block';
+            
+            document.querySelectorAll('.admin-tab').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-tab') === tab) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            if (tab === 'tickets') loadTickets();
+            if (tab === 'stats') loadStats();
+            if (tab === 'users') loadUsers();
+        }
+        
+        function filterTickets() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            
+            let filtered = [...currentTickets];
+            if (search) {
+                filtered = filtered.filter(t => 
+                    t.subject.toLowerCase().includes(search) || 
+                    (t.username && t.username.toLowerCase().includes(search))
+                );
+            }
+            if (status) {
+                filtered = filtered.filter(t => t.status === status);
+            }
+            renderTickets(filtered);
+        }
+        
+        async function loadTickets() {
+            const container = document.getElementById('ticketsList');
+            container.innerHTML = '<div class="loading">Загрузка...</div>';
+            
+            try {
+                const res = await fetch('/api/admin/tickets', { credentials: 'include' });
+                if (!res.ok) throw new Error('Failed to load tickets');
+                currentTickets = await res.json();
+                renderTickets(currentTickets);
+            } catch(e) {
+                console.error('Error loading tickets:', e);
+                container.innerHTML = '<div class="loading">Ошибка загрузки обращений</div>';
+            }
+        }
+        
+        function renderTickets(tickets) {
+            const container = document.getElementById('ticketsList');
+            if (!tickets.length) {
+                container.innerHTML = '<div class="loading">Нет обращений</div>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div style="overflow-x: auto;">
+                    <table class="tickets-table">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTickets('id')">ID <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTickets('username')">Пользователь <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTickets('subject')">Тема <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTickets('status')">Статус <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTickets('created_at')">Дата <span class="sort-icon">↕</span></th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tickets.map(ticket => `
+                                <tr>
+                                    <td>${ticket.id}</td>
+                                    <td>${escapeHtml(ticket.username)}<br><small style="color:#999;">${escapeHtml(ticket.email)}</small></td>
+                                    <td>${escapeHtml(ticket.subject)}</td>
+                                    <td><span class="status-badge status-${ticket.status}">${getStatusText(ticket.status)}</span></td>
+                                    <td>${new Date(ticket.created_at).toLocaleString()}</td>
+                                    <td><button class="btn-sm btn-primary" onclick="viewTicket(${ticket.id})">Просмотр</button></td>
+                                　
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        function sortTickets(field) {
+            currentTickets.sort((a, b) => {
+                let valA = a[field];
+                let valB = b[field];
+                if (typeof valA === 'string') valA = valA.toLowerCase();
+                if (typeof valB === 'string') valB = valB.toLowerCase();
+                if (valA < valB) return -1;
+                if (valA > valB) return 1;
+                return 0;
+            });
+            filterTickets();
+        }
+        
+        async function viewTicket(ticketId) {
+            currentTicketId = ticketId;
+            const ticket = currentTickets.find(t => t.id === ticketId);
+            if (!ticket) return;
+            
+            try {
+                const repliesRes = await fetch(`/api/admin/tickets/${ticketId}/replies`, { credentials: 'include' });
+                const replies = await repliesRes.json();
+                
+                document.getElementById('modalTitle').textContent = `Обращение #${ticket.id} - ${escapeHtml(ticket.subject)}`;
+                document.getElementById('ticketInfo').innerHTML = `
+                    <div style="background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:15px;">
+                        <p><strong>Пользователь:</strong> ${escapeHtml(ticket.username)} (${escapeHtml(ticket.email)})</p>
+                        <p><strong>Статус:</strong> <span class="status-badge status-${ticket.status}">${getStatusText(ticket.status)}</span></p>
+                        <p><strong>Дата создания:</strong> ${new Date(ticket.created_at).toLocaleString()}</p>
+                        <p><strong>Сообщение:</strong></p>
+                        <div style="background:white;padding:12px;border-radius:6px;margin-top:8px;white-space:pre-wrap;">${escapeHtml(ticket.message)}</div>
+                    </div>
+                `;
+                
+                const repliesContainer = document.getElementById('repliesList');
+                if (!replies || replies.length === 0) {
+                    repliesContainer.innerHTML = '<p style="color:#999;">Нет ответов</p>';
+                } else {
+                    repliesContainer.innerHTML = `<strong>История переписки:</strong>` + replies.map(r => `
+                        <div class="reply-item ${r.is_from_support ? 'reply-support' : 'reply-user'}">
+                            <small style="color:#666;">${r.is_from_support ? 'Поддержка' : escapeHtml(r.username)} · ${new Date(r.created_at).toLocaleString()}</small>
+                            <div style="margin-top:5px; white-space:pre-wrap;">${escapeHtml(r.message)}</div>
+                        </div>
+                    `).join('');
+                }
+                
+                const closeBtn = document.getElementById('closeBtn');
+                if (ticket.status !== 'closed' && (currentUser.role === 'admin' || currentUser.role === 'specialist')) {
+                    closeBtn.style.display = 'inline-block';
+                } else {
+                    closeBtn.style.display = 'none';
+                }
+                
+                document.getElementById('ticketModal').classList.add('active');
+            } catch(e) {
+                console.error('Error viewing ticket:', e);
+                alert('Ошибка загрузки обращения');
+            }
+        }
+        
+        async function sendReply() {
+            const message = document.getElementById('replyMessage').value;
+            if (!message) {
+                alert('Введите сообщение');
+                return;
+            }
+            
+            try {
+                const res = await fetch(`/api/admin/tickets/${currentTicketId}/reply`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message }),
+                    credentials: 'include'
+                });
+                
+                if (res.ok) {
+                    alert('Ответ отправлен');
+                    document.getElementById('replyMessage').value = '';
+                    await loadTickets();
+                    await viewTicket(currentTicketId);
+                } else {
+                    alert('Ошибка отправки');
+                }
+            } catch(e) {
+                alert('Ошибка соединения');
+            }
+        }
+        
+        async function closeTicket() {
+            if (!confirm('Закрыть обращение?')) return;
+            
+            try {
+                const res = await fetch(`/api/admin/tickets/${currentTicketId}/close`, {
+                    method: 'PUT',
+                    credentials: 'include'
+                });
+                
+                if (res.ok) {
+                    alert('Обращение закрыто');
+                    await loadTickets();
+                    await viewTicket(currentTicketId);
+                } else {
+                    alert('Ошибка');
+                }
+            } catch(e) {
+                alert('Ошибка');
+            }
+        }
+        
+        async function loadStats() {
+            const container = document.getElementById('statsGrid');
+            container.innerHTML = '<div class="loading">Загрузка...</div>';
+            
+            try {
+                const res = await fetch('/api/admin/stats', { credentials: 'include' });
+                if (!res.ok) throw new Error('Failed to load stats');
+                const stats = await res.json();
+                
+                container.innerHTML = `
+                    <div class="stat-card"><h3>Всего обращений</h3><div class="value">${stats.total || 0}</div></div>
+                    <div class="stat-card"><h3>Открытые</h3><div class="value">${stats.open || 0}</div></div>
+                    <div class="stat-card"><h3>В работе</h3><div class="value">${stats.in_progress || 0}</div></div>
+                    <div class="stat-card"><h3>Закрытые</h3><div class="value">${stats.closed || 0}</div></div>
+                `;
+            } catch(e) {
+                console.error('Error loading stats:', e);
+                container.innerHTML = '<div class="loading">Ошибка загрузки статистики</div>';
+            }
+        }
+        
+        async function loadUsers() {
+            const container = document.getElementById('usersList');
+            container.innerHTML = '<div class="loading">Загрузка...</div>';
+            
+            try {
+                const res = await fetch('/api/admin/users', { credentials: 'include' });
+                if (!res.ok) throw new Error('Failed to load users');
+                allUsers = await res.json();
+                filterAndSortUsers();
+            } catch(e) {
+                console.error('Error loading users:', e);
+                container.innerHTML = '<div class="loading">Ошибка загрузки пользователей</div>';
+            }
+        }
+        
+        function filterAndSortUsers() {
+            const searchTerm = document.getElementById('userSearchInput').value.toLowerCase();
+            const roleFilter = document.getElementById('roleFilter').value;
+            
+            let filtered = [...allUsers];
+            
+            // Поиск по логину или email
+            if (searchTerm) {
+                filtered = filtered.filter(user => 
+                    user.username.toLowerCase().includes(searchTerm) || 
+                    user.email.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Фильтр по роли
+            if (roleFilter) {
+                filtered = filtered.filter(user => user.role === roleFilter);
+            }
+            
+            // Сортировка
+            filtered.sort((a, b) => {
+                let valA = a[usersSortField];
+                let valB = b[usersSortField];
+                if (typeof valA === 'string') valA = valA.toLowerCase();
+                if (typeof valB === 'string') valB = valB.toLowerCase();
+                if (valA < valB) return usersSortOrder === 'asc' ? -1 : 1;
+                if (valA > valB) return usersSortOrder === 'asc' ? 1 : -1;
+                return 0;
+            });
+            
+            renderUsers(filtered);
+        }
+        
+        function sortUsers(field) {
+            if (usersSortField === field) {
+                usersSortOrder = usersSortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                usersSortField = field;
+                usersSortOrder = 'asc';
+            }
+            filterAndSortUsers();
+        }
+        
+        function renderUsers(users) {
+            const container = document.getElementById('usersList');
+            if (!users.length) {
+                container.innerHTML = '<div class="loading">Нет пользователей</div>';
+                return;
+            }
+            
+            const getSortIcon = (field) => {
+                if (usersSortField !== field) return '↕';
+                return usersSortOrder === 'asc' ? '↑' : '↓';
+            };
+            
+            container.innerHTML = `
+                <div style="margin-bottom: 10px; text-align: right;">
+                    <span class="total-count">Всего: ${users.length} пользователей</span>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th onclick="sortUsers('id')">ID <span class="sort-icon">${getSortIcon('id')}</span></th>
+                                <th onclick="sortUsers('username')">Логин <span class="sort-icon">${getSortIcon('username')}</span></th>
+                                <th onclick="sortUsers('email')">Email <span class="sort-icon">${getSortIcon('email')}</span></th>
+                                <th onclick="sortUsers('role')">Роль <span class="sort-icon">${getSortIcon('role')}</span></th>
+                                <th onclick="sortUsers('created_at')">Дата регистрации <span class="sort-icon">${getSortIcon('created_at')}</span></th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${users.map(user => `
+                                <tr>
+                                    <td>${user.id}</td>
+                                    <td>${escapeHtml(user.username)}</td>
+                                    <td>${escapeHtml(user.email)}</td>
+                                    <td>
+                                        <select class="role-select" onchange="changeRole(${user.id}, this.value)" ${user.id === currentUser.id ? 'disabled' : ''}>
+                                            <option value="user" ${user.role === 'user' ? 'selected' : ''}>Пользователь</option>
+                                            <option value="specialist" ${user.role === 'specialist' ? 'selected' : ''}>Специалист</option>
+                                            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Администратор</option>
+                                        </select>
+                                    </td>
+                                    <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                                    <td>
+                                        <button class="btn-sm btn-danger" onclick="deleteUser(${user.id})" ${user.id === currentUser.id ? 'disabled' : ''}>Удалить</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        async function changeRole(userId, role) {
+            try {
+                const res = await fetch(`/api/admin/users/${userId}/role`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role }),
+                    credentials: 'include'
+                });
+                if (res.ok) {
+                    await loadUsers();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Ошибка изменения роли');
+                }
+            } catch(e) {
+                alert('Ошибка соединения');
+            }
+        }
+        
+        async function deleteUser(userId) {
+            if (!confirm('Удалить пользователя? Все его обращения останутся в системе.')) return;
+            
+            try {
+                const res = await fetch(`/api/admin/users/${userId}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                
+                const data = await res.json();
+                if (res.ok) {
+                    alert('Пользователь удалён');
+                    await loadUsers();
+                } else {
+                    alert(data.error || 'Ошибка удаления');
+                }
+            } catch(e) {
+                alert('Ошибка соединения');
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('ticketModal').classList.remove('active');
+            document.getElementById('replyMessage').value = '';
+            currentTicketId = null;
+        }
+        
+        function getStatusText(status) {
+            const statuses = { 'open': 'Открыто', 'in_progress': 'В работе', 'closed': 'Закрыто' };
+            return statuses[status] || status;
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function goToSite() {
+            window.location.href = '/';
+        }
+        
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+            window.location.href = '/login.html';
+        }
+        
+        // Глобальные функции для onclick
+        window.sortTickets = sortTickets;
+        window.sortUsers = sortUsers;
+        window.viewTicket = viewTicket;
+        window.sendReply = sendReply;
+        window.closeTicket = closeTicket;
+        window.changeRole = changeRole;
+        window.deleteUser = deleteUser;
+        window.closeModal = closeModal;
+        window.goToSite = goToSite;
+        window.logout = logout;
+        window.loadTickets = loadTickets;
+        window.loadUsers = loadUsers;
+    </script>
+</body>
+</html>

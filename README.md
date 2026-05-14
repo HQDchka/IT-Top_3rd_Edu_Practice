@@ -1,5 +1,13 @@
 # Service Desk - Модуль технической поддержки для встраивания в любой сайт
 
+[![Version](https://img.shields.io/badge/version-1.0-blue.svg)](https://github.com/yourusername/service-desk)
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-2.3.0-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Status](https://img.shields.io/badge/status-stable-brightgreen.svg)](https://github.com/yourusername/service-desk)
 ## О проекте
 
 Service Desk - это готовый к встраиванию модуль технической поддержки, который можно интегрировать в любой существующий сайт за несколько минут. Модуль представляет собой полноценную систему учёта обращений с разграничением ролей пользователей, виджетом поддержки и панелью администратора.
